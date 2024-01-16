@@ -8,6 +8,10 @@ import DB
 import Discord
 
 RESTARTCODE = 100
+STOP_BTN_NAME = 'Stop'
+START_BTN_NAME = 'Start'
+OPTION_GB_NAME = 'Option'
+WEBHOOK_GB_NAME = 'WebHook'
 
 # get random 4 digit number
 def getVerifyingCode():
@@ -46,7 +50,7 @@ class MyWindow(QWidget):
     
 
     def createGroup_webhook(self):
-        groupbox = QGroupBox('WebHook')
+        groupbox = QGroupBox(WEBHOOK_GB_NAME)
 
         WEBHOOK = DB.loadWEBHOOK()
         label_webhook = QLabel(WEBHOOK)
@@ -72,7 +76,7 @@ class MyWindow(QWidget):
         return groupbox
     
     def createGroup_option(self):
-        groupbox = QGroupBox('Option')
+        groupbox = QGroupBox(OPTION_GB_NAME)
 
         cb_checkingTime = QComboBox(self)
         for time in DB.CheckingTime_list:
@@ -102,9 +106,9 @@ class MyWindow(QWidget):
         vbox_L.addWidget(btn_quit)
         vbox_L.addWidget(btn_restart)
 
-        btn_start = QPushButton('Start')
+        btn_start = QPushButton(START_BTN_NAME)
         btn_start.clicked.connect(self.btn_start_function)
-        btn_stop = QPushButton('Stop')
+        btn_stop = QPushButton(STOP_BTN_NAME)
         btn_stop.setDisabled(True)
         btn_stop.clicked.connect(self.btn_stop_function)
         
@@ -124,19 +128,29 @@ class MyWindow(QWidget):
         print('start function')
         button_list = self.findChildren(QPushButton)
         for button in button_list:
-            if button.text() == 'Stop':
+            if button.text() == STOP_BTN_NAME:
                 button.setEnabled(True)
-            elif button.text() == 'Start':
+            elif button.text() == START_BTN_NAME:
                 button.setDisabled(True)
+        
+        qGroupBox_List = self.findChildren(QGroupBox)
+        for qGroupBox in qGroupBox_List:
+            if qGroupBox.title() == OPTION_GB_NAME or qGroupBox.title() == WEBHOOK_GB_NAME:
+                qGroupBox.setDisabled(True)
 
     def btn_stop_function(self):
         print('stop function')
         button_list = self.findChildren(QPushButton)
         for button in button_list:
-            if button.text() == 'Start':
+            if button.text() == START_BTN_NAME:
                 button.setEnabled(True)
-            elif button.text() == 'Stop':
+            elif button.text() == STOP_BTN_NAME:
                 button.setDisabled(True)
+                
+        qGroupBox_List = self.findChildren(QGroupBox)
+        for qGroupBox in qGroupBox_List:
+            if qGroupBox.title() == OPTION_GB_NAME or qGroupBox.title() == WEBHOOK_GB_NAME:
+                qGroupBox.setEnabled(True)
 
     def btn_quit_function(self):
         qApp.exit(0)
@@ -168,7 +182,9 @@ class MyWindow(QWidget):
 
     def cb_checkingTime_onActivated(self, time):
         DB.saveCheckingTime(time)
-    
+
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     while True:
