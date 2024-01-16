@@ -1,14 +1,14 @@
 DBPATH = './Mining Manager/DataBase/'
 WEBHOOK_DB_NAME = 'WEBHOOK'
-CHECKINGTIME_DB_NAME = 'CheckingTime'
+CHECKINGTIME_DB_NAME = 'Option_time'
+INFO_DB_NAME = 'Option_info'
+WHEN_DB_NAME = 'Option_when'
 
 CheckingTime_list = [1, 3, 5, 10, 15, 20]
 
-## getPath ./Mining Manager/DataBase/ + name + .text
 def getPath(name):
     return f'{DBPATH}{name}.txt'
 
-## load WebHook url
 def loadWEBHOOK():
     url = getPath(WEBHOOK_DB_NAME)
     file = open(url, 'r')
@@ -17,8 +17,6 @@ def loadWEBHOOK():
     print(f'DB.loadWEBHOOK():: load \"{WEBHOOK}\" in {url}')
     return WEBHOOK
 
-# text = WebHook url
-## save or update WebHook
 def saveWEBHOOK(text):
     url = getPath(WEBHOOK_DB_NAME)
     print(f'DB.saveWEBHOOK():: save(update) {url}')
@@ -27,24 +25,59 @@ def saveWEBHOOK(text):
     print(f' -> \"{text}\"')
     file.close()
 
-## load checking time index
 def loadCheckingTime():
     url = getPath(CHECKINGTIME_DB_NAME)
     file = open(url, 'r')
     checkingTime = file.readline()
     file.close()
-    print(f'DB.loadCheckingTimeIdx():: load \"{checkingTime}\" in {url}')
-    return int(checkingTime)
+    print(f'DB.loadCheckingTime():: load \"{checkingTime}\" in {url}')
+    return checkingTime
 
-# checkingTime = Checking time index
-## save or update checkingTime
 def saveCheckingTime(checkingTime):
     url = getPath(CHECKINGTIME_DB_NAME)
-    print(f'DB.saveCheckingTimeIdx():: save(update) {url}')
+    print(f'DB.saveCheckingTime():: save(update) {url}')
     file = open(url, 'w')
     file.write(str(checkingTime))
     print(f' -> \"{checkingTime}\"')
     file.close()
+
+def loadInfo():
+    url = getPath(INFO_DB_NAME)
+    file = open(url, 'r')
+    seq = file.readline()
+    file.close()
+    print(f'DB.loadInfo():: load \"{seq}\" in {url}')
+    return seq
+
+def saveInfo(seq):
+    url = getPath(INFO_DB_NAME)
+    print(f'DB.saveInfo():: save(update) {url}')
+    file = open(url, 'w')
+    file.write(seq)
+    print(f' -> \"{seq}\"')
+    file.close()
+
+def loadWhen():
+    url = getPath(WHEN_DB_NAME)
+    file = open(url, 'r')
+    seq = file.readline()
+    file.close()
+    print(f'DB.loadWhen():: load \"{seq}\" in {url}')
+    return seq
+
+def saveWhen(seq):
+    url = getPath(WHEN_DB_NAME)
+    print(f'DB.saveWhen():: save(update) {url}')
+    file = open(url, 'w')
+    file.write(seq)
+    print(f' -> \"{seq}\"')
+    file.close()
+
+def Reset_default_values():
+    print('DB::Reset_default_values():: Reset default values')
+    saveCheckingTime(CheckingTime_list[2])
+    saveInfo('00000')
+    saveWhen('000')
 
 # name = File name without '.txt'
 # workers = worker List

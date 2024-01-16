@@ -13,6 +13,12 @@ START_BTN_NAME = 'Start'
 OPTION_GB_NAME = 'Option'
 WEBHOOK_GB_NAME = 'WebHook'
 
+WINDOWSIZE_H = 900
+WINDOWSIZE_V = 330
+
+OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Adding device', 'Removing device']
+OPTION_INFO_LIST = ['Device / Mining pool', 'time', 'Hash', 'Discovered problem', 'Presumptive problem']
+
 # get random 4 digit number
 def getVerifyingCode():
     code = ''
@@ -20,6 +26,18 @@ def getVerifyingCode():
         code += str(random.randrange(0, 10))
     return code
 
+def CheckingData():
+    print('CheckingData()::Checking the Data format from option DataBase')
+    when_seq = DB.loadWhen()
+    info_seq = DB.loadInfo()
+    time = DB.loadCheckingTime()
+    if len(OPTION_WHEN_LIST) != len(when_seq) or len(OPTION_INFO_LIST) != len(info_seq) or time == '':
+        print(' = Reset')
+        DB.Reset_default_values()
+        return False
+    print(' = Clear')
+    return True
+    
 class MyWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -32,8 +50,13 @@ class MyWindow(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
     
+    def occurData_Format_problem(self):
+        QMessageBox.information(self, 'Information', 'Option setting was reset.\nBecause option Data from DataBase unmatched the Normal format', QMessageBox.Yes)
+
     # window initialize function
     def init(self):
+        if CheckingData() == False:
+            self.occurData_Format_problem()
         grid = QGridLayout()
         grid.addWidget(self.createGroup_webhook(), 0, 0)
         grid.addWidget(self.createGroup_option(), 1, 0)
@@ -42,13 +65,12 @@ class MyWindow(QWidget):
 
         self.setWindowIcon(QIcon('./Mining Manager/Icon/Title_Icon.png'))
         self.setWindowTitle('Mining Manager')
-        self.setMaximumSize(900, 450)
-        self.setMinimumSize(900, 450)
+        self.setMaximumSize(WINDOWSIZE_H, WINDOWSIZE_V)
+        self.setMinimumSize(WINDOWSIZE_H, WINDOWSIZE_V)
         self.center()
 
         self.show()
     
-
     def createGroup_webhook(self):
         groupbox = QGroupBox(WEBHOOK_GB_NAME)
         WEBHOOK = DB.loadWEBHOOK()
@@ -76,42 +98,54 @@ class MyWindow(QWidget):
     def createGroup_option(self):
         groupbox = QGroupBox(OPTION_GB_NAME)
 
+        cb_label = QLabel('CheckingTime (min)')
         cb_checkingTime = QComboBox(self)
         for time in DB.CheckingTime_list:
             cb_checkingTime.addItem(str(time))
         cb_checkingTime.activated[str].connect(self.cb_checkingTime_onActivated)
         cb_checkingTime.setCurrentText(str(DB.loadCheckingTime()))
-        cb_label = QLabel('CheckingTime (min)')
+        btn_settingReset = QPushButton('Reset default values', self)
+        btn_settingReset.clicked.connect(self.btn_settingReset_function)
 
         vbox_checkTime = QVBoxLayout()
         vbox_checkTime.addWidget(cb_label)
         vbox_checkTime.addWidget(cb_checkingTime)
+        vbox_checkTime.addStretch(1)
+        vbox_checkTime.addWidget(btn_settingReset)
         
         notification_label = QLabel('Receive notifications when')
-        checkBox_notification_label_lost = QCheckBox('Connection loss / Hash reduction', self)
-        checkBox_notification_label_add = QCheckBox('Adding device', self)
-        checkBox_notification_label_delete = QCheckBox('Removing device', self)
+        checkBox_whenList = []
+        chechBox_whenData = DB.loadWhen()
+        for checkBox in OPTION_WHEN_LIST:
+            checkBox_whenList.append(QCheckBox(checkBox, self))
+        
+        for i in range(0, len(OPTION_WHEN_LIST)):
+            if chechBox_whenData[i] == '1':
+                checkBox_whenList[i].toggle()
+            checkBox_whenList[i].stateChanged.connect(self.checkBox_optionUpdate_function)
 
         vbox_alert = QVBoxLayout()
         vbox_alert.addWidget(notification_label)
-        vbox_alert.addWidget(checkBox_notification_label_lost)
-        vbox_alert.addWidget(checkBox_notification_label_add)
-        vbox_alert.addWidget(checkBox_notification_label_delete)
+        for checkBox in checkBox_whenList:
+            vbox_alert.addWidget(checkBox)
+        vbox_alert.addStretch(1)
 
         info_label = QLabel('Receive following information')
-        checkBox_info_deviceAndPool = QCheckBox('Device / Mining pool', self)
-        checkBox_info_time = QCheckBox('time', self)
-        checkBox_info_hash = QCheckBox('Hash', self)
-        checkBox_info_problemDis = QCheckBox('Discovered problem', self)
-        checkBox_info_problemPre = QCheckBox('Presumptive problem', self)
+        checkBox_infoList = []
+        chechBox_infoData = DB.loadInfo()
+        for checkBox in OPTION_INFO_LIST:
+            checkBox_infoList.append(QCheckBox(checkBox, self))
+            
+        for i in range(0, len(OPTION_INFO_LIST)):
+            if chechBox_infoData[i] == '1':
+                checkBox_infoList[i].toggle()
+            checkBox_infoList[i].stateChanged.connect(self.checkBox_optionUpdate_function)
 
         vbox_info = QVBoxLayout()
         vbox_info.addWidget(info_label)
-        vbox_info.addWidget(checkBox_info_deviceAndPool)
-        vbox_info.addWidget(checkBox_info_time)
-        vbox_info.addWidget(checkBox_info_hash)
-        vbox_info.addWidget(checkBox_info_problemDis)
-        vbox_info.addWidget(checkBox_info_problemPre)
+        for checkBox in checkBox_infoList:
+            vbox_info.addWidget(checkBox)
+        vbox_info.addStretch(1)
 
         hbox = QHBoxLayout()
         hbox.addLayout(vbox_checkTime)
@@ -207,9 +241,38 @@ class MyWindow(QWidget):
         program_sendMessage.start()
         QMessageBox.information(self, 'Information', f'sent verifying Code {verifyingCode} to this WebHook link', QMessageBox.Yes)
 
+    def btn_settingReset_function(self):
+        DB.Reset_default_values()
+        qApp.exit(RESTARTCODE)
+
+
+
+    def checkBox_optionUpdate_function(self):
+        option_when_seq = ''
+        option_info_seq = ''
+        checkBox_list = self.findChildren(QCheckBox)
+        for checkBox_name in OPTION_WHEN_LIST:
+            for find_checkBox in checkBox_list:
+                if checkBox_name == find_checkBox.text():
+                    if find_checkBox.isChecked():
+                        option_when_seq += '1'
+                    else:
+                        option_when_seq += '0'
+                        
+        for checkBox_name in OPTION_INFO_LIST:
+            for find_checkBox in checkBox_list:
+                if checkBox_name == find_checkBox.text():
+                    if find_checkBox.isChecked():
+                        option_info_seq += '1'
+                    else:
+                        option_info_seq += '0'
+        
+        DB.saveWhen(option_when_seq)
+        DB.saveInfo(option_info_seq)
 
     def cb_checkingTime_onActivated(self, time):
         DB.saveCheckingTime(time)
+
 
 
 
