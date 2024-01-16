@@ -1,5 +1,5 @@
 # Mining Managing Program
-This program manage the Cryptocurrency Mining. Check the connection status between mining machine and mining pool every fixed time.
+This program manage the Cryptocurrency Mining. Check the connection status between mining machine and mining pool every fixed time. and if find a disconnected machine with own mining pool, then sending a message to a Administrator 
 
 ## Overview
 ### Computer graphics
