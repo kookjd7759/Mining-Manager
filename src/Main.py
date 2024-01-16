@@ -42,8 +42,8 @@ class MyWindow(QWidget):
 
         self.setWindowIcon(QIcon('./Mining Manager/Icon/Title_Icon.png'))
         self.setWindowTitle('Mining Manager')
-        self.setMaximumSize(900, 300)
-        self.setMinimumSize(900, 300)
+        self.setMaximumSize(900, 450)
+        self.setMinimumSize(900, 450)
         self.center()
 
         self.show()
@@ -51,7 +51,6 @@ class MyWindow(QWidget):
 
     def createGroup_webhook(self):
         groupbox = QGroupBox(WEBHOOK_GB_NAME)
-
         WEBHOOK = DB.loadWEBHOOK()
         label_webhook = QLabel(WEBHOOK)
 
@@ -59,7 +58,6 @@ class MyWindow(QWidget):
         btn_edit.clicked.connect(self.btn_edit_function)
         btn_delete = QPushButton('Delete', self)
         btn_delete.clicked.connect(self.btn_delete_function)
-
         btn_test = QPushButton('Connection Test', self)
         btn_test.clicked.connect(self.btn_ConnectionTest_function)
 
@@ -82,14 +80,44 @@ class MyWindow(QWidget):
         for time in DB.CheckingTime_list:
             cb_checkingTime.addItem(str(time))
         cb_checkingTime.activated[str].connect(self.cb_checkingTime_onActivated)
-
         cb_checkingTime.setCurrentText(str(DB.loadCheckingTime()))
         cb_label = QLabel('CheckingTime (min)')
 
-        vbox = QVBoxLayout()
-        vbox.addWidget(cb_label)
-        vbox.addWidget(cb_checkingTime)
-        groupbox.setLayout(vbox)
+        vbox_checkTime = QVBoxLayout()
+        vbox_checkTime.addWidget(cb_label)
+        vbox_checkTime.addWidget(cb_checkingTime)
+        
+        notification_label = QLabel('Receive notifications when')
+        checkBox_notification_label_lost = QCheckBox('Connection loss / Hash reduction', self)
+        checkBox_notification_label_add = QCheckBox('Adding device', self)
+        checkBox_notification_label_delete = QCheckBox('Removing device', self)
+
+        vbox_alert = QVBoxLayout()
+        vbox_alert.addWidget(notification_label)
+        vbox_alert.addWidget(checkBox_notification_label_lost)
+        vbox_alert.addWidget(checkBox_notification_label_add)
+        vbox_alert.addWidget(checkBox_notification_label_delete)
+
+        info_label = QLabel('Receive following information')
+        checkBox_info_deviceAndPool = QCheckBox('Device / Mining pool', self)
+        checkBox_info_time = QCheckBox('time', self)
+        checkBox_info_hash = QCheckBox('Hash', self)
+        checkBox_info_problemDis = QCheckBox('Discovered problem', self)
+        checkBox_info_problemPre = QCheckBox('Presumptive problem', self)
+
+        vbox_info = QVBoxLayout()
+        vbox_info.addWidget(info_label)
+        vbox_info.addWidget(checkBox_info_deviceAndPool)
+        vbox_info.addWidget(checkBox_info_time)
+        vbox_info.addWidget(checkBox_info_hash)
+        vbox_info.addWidget(checkBox_info_problemDis)
+        vbox_info.addWidget(checkBox_info_problemPre)
+
+        hbox = QHBoxLayout()
+        hbox.addLayout(vbox_checkTime)
+        hbox.addLayout(vbox_alert)
+        hbox.addLayout(vbox_info)
+        groupbox.setLayout(hbox)
 
         return groupbox
     

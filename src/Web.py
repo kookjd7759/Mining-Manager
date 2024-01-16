@@ -17,4 +17,3 @@ header = {
 data = webGet_json(url=url, header=header)
 for worker in data['workers']:
     print(worker['name'])
-
