@@ -1,8 +1,11 @@
 import requests
 
-def send_message(WEBHOOK, text):     
+def send_message(WEBHOOK, text):
     data = {
         "content" : text,
     }
-    requests.post(WEBHOOK, json=data)
-
+    try:
+        requests.post(WEBHOOK, json=data)
+    except:
+        return -1
+    return 1

@@ -12,9 +12,10 @@ STOP_BTN_NAME = 'Stop'
 START_BTN_NAME = 'Start'
 OPTION_GB_NAME = 'Option'
 WEBHOOK_GB_NAME = 'WebHook'
+CONSOLE_GB_NAME = 'Excution Console'
 
 WINDOWSIZE_H = 900
-WINDOWSIZE_V = 330
+WINDOWSIZE_V = 580
 
 OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Adding device', 'Removing device']
 OPTION_INFO_LIST = ['Device / Mining pool', 'time', 'Hash', 'Discovered problem', 'Presumptive problem']
@@ -37,8 +38,13 @@ def CheckingData():
         return False
     print(' = Clear')
     return True
-    
+
 class MyWindow(QWidget):
+
+    def run(self):
+        browser = self.findChild(QTextBrowser)
+        browser.append('start')
+
     def __init__(self):
         super().__init__()
         self.init()
@@ -53,6 +59,8 @@ class MyWindow(QWidget):
     def occurData_Format_problem(self):
         QMessageBox.information(self, 'Information', 'Option setting was reset.\nBecause option Data from DataBase unmatched the Normal format', QMessageBox.Yes)
 
+
+
     # window initialize function
     def init(self):
         if CheckingData() == False:
@@ -60,10 +68,11 @@ class MyWindow(QWidget):
         grid = QGridLayout()
         grid.addWidget(self.createGroup_webhook(), 0, 0)
         grid.addWidget(self.createGroup_option(), 1, 0)
-        grid.addWidget(self.createGroup_under(), 2, 0)
+        grid.addWidget(self.createGroup_menu(), 2, 0)
+        grid.addWidget(self.createGroup_excute(), 3, 0)
         self.setLayout(grid)
 
-        self.setWindowIcon(QIcon('./Mining Manager/Icon/Title_Icon.png'))
+        self.setWindowIcon(QIcon('./Mining Manager/Image/Icon/Title_Icon.png'))
         self.setWindowTitle('Mining Manager')
         self.setMaximumSize(WINDOWSIZE_H, WINDOWSIZE_V)
         self.setMinimumSize(WINDOWSIZE_H, WINDOWSIZE_V)
@@ -71,6 +80,8 @@ class MyWindow(QWidget):
 
         self.show()
     
+
+
     def createGroup_webhook(self):
         groupbox = QGroupBox(WEBHOOK_GB_NAME)
         WEBHOOK = DB.loadWEBHOOK()
@@ -155,7 +166,7 @@ class MyWindow(QWidget):
 
         return groupbox
     
-    def createGroup_under(self):
+    def createGroup_menu(self):
         groupbox = QGroupBox()
         groupbox.setFlat(True)
 
@@ -185,8 +196,22 @@ class MyWindow(QWidget):
 
         return groupbox
     
+    def createGroup_excute(self):
+        groupbox = QGroupBox(CONSOLE_GB_NAME)
+        groupbox.setDisabled(True)
+
+        txtBrowser_consol = QTextBrowser()
+        txtBrowser_consol.setOpenExternalLinks(True)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(txtBrowser_consol)
+        groupbox.setLayout(vbox)
+
+        return groupbox
+
 
     def btn_start_function(self):
+        self.run()
         print('start function')
         button_list = self.findChildren(QPushButton)
         for button in button_list:
@@ -199,6 +224,8 @@ class MyWindow(QWidget):
         for qGroupBox in qGroupBox_List:
             if qGroupBox.title() == OPTION_GB_NAME or qGroupBox.title() == WEBHOOK_GB_NAME:
                 qGroupBox.setDisabled(True)
+            elif qGroupBox.title() == CONSOLE_GB_NAME:
+                qGroupBox.setEnabled(True)
 
     def btn_stop_function(self):
         print('stop function')
@@ -213,6 +240,8 @@ class MyWindow(QWidget):
         for qGroupBox in qGroupBox_List:
             if qGroupBox.title() == OPTION_GB_NAME or qGroupBox.title() == WEBHOOK_GB_NAME:
                 qGroupBox.setEnabled(True)
+            elif qGroupBox.title() == CONSOLE_GB_NAME:
+                qGroupBox.setDisabled(True)
 
     def btn_quit_function(self):
         qApp.exit(0)
@@ -228,7 +257,7 @@ class MyWindow(QWidget):
             qApp.exit(RESTARTCODE)
     
     def btn_delete_function(self):
-        ans = QMessageBox.information(self, 'Information', 'Are you sure deleting your WebHook link on this program ?', QMessageBox.Yes | QMessageBox.No)
+        ans = QMessageBox.information(self, 'Information', 'Are you sure delete WebHook link on this program ?', QMessageBox.Yes | QMessageBox.No)
         if ans == QMessageBox.Yes:
             DB.saveWEBHOOK('')
             qApp.exit(RESTARTCODE)
@@ -236,14 +265,17 @@ class MyWindow(QWidget):
     def btn_ConnectionTest_function(self):
         WEBHOOK = DB.loadWEBHOOK()
         verifyingCode = getVerifyingCode()
-        program_sendMessage = threading.Thread(target=Discord.send_message, 
-                              args=(WEBHOOK, f'VerifyingCode : {verifyingCode}'))
-        program_sendMessage.start()
-        QMessageBox.information(self, 'Information', f'sent verifying Code {verifyingCode} to this WebHook link', QMessageBox.Yes)
+        program = Discord.send_message(WEBHOOK, f'VerifyingCode : {verifyingCode}')
+        if program == -1:
+            QMessageBox.warning(self, 'Webhook Error', f'The Webhook link is not work. Check the Webhook Link')
+        else:
+            QMessageBox.information(self, 'Information', f'sent verifying Code {verifyingCode} to this WebHook link', QMessageBox.Yes)
 
     def btn_settingReset_function(self):
-        DB.Reset_default_values()
-        qApp.exit(RESTARTCODE)
+        ans = QMessageBox.information(self, 'Information', 'Are you sure reset setting to a default value ?', QMessageBox.Yes | QMessageBox.No)
+        if ans == QMessageBox.Yes:
+            DB.Reset_default_values()
+            qApp.exit(RESTARTCODE)
 
 
 

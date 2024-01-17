@@ -9,8 +9,22 @@ CheckingTime_list = [1, 3, 5, 10, 15, 20]
 def getPath(name):
     return f'{DBPATH}{name}.txt'
 
+def mktxt(name):
+    url = getPath(name)
+    file = open(url, 'w')
+    file.write('')
+    file.close()
+
+
 def loadWEBHOOK():
     url = getPath(WEBHOOK_DB_NAME)
+
+    try:
+        file = open(url, 'r')
+    except FileNotFoundError:
+        print(f'File Not found, Create one{url} ')
+        mktxt(WEBHOOK_DB_NAME)
+    
     file = open(url, 'r')
     WEBHOOK = file.readline()
     file.close()
@@ -27,6 +41,13 @@ def saveWEBHOOK(text):
 
 def loadCheckingTime():
     url = getPath(CHECKINGTIME_DB_NAME)
+
+    try:
+        file = open(url, 'r')
+    except FileNotFoundError:
+        print(f'File Not found, Create one{url} ')
+        mktxt(CHECKINGTIME_DB_NAME)
+
     file = open(url, 'r')
     checkingTime = file.readline()
     file.close()
@@ -43,6 +64,13 @@ def saveCheckingTime(checkingTime):
 
 def loadInfo():
     url = getPath(INFO_DB_NAME)
+
+    try:
+        file = open(url, 'r')
+    except FileNotFoundError:
+        print(f'File Not found, Create one{url} ')
+        mktxt(INFO_DB_NAME)
+
     file = open(url, 'r')
     seq = file.readline()
     file.close()
@@ -59,6 +87,13 @@ def saveInfo(seq):
 
 def loadWhen():
     url = getPath(WHEN_DB_NAME)
+    
+    try:
+        file = open(url, 'r')
+    except FileNotFoundError:
+        print(f'File Not found, Create one{url} ')
+        mktxt(WHEN_DB_NAME)
+
     file = open(url, 'r')
     seq = file.readline()
     file.close()

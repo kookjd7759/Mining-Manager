@@ -14,3 +14,6 @@ header = {
     'referer': 'https://kaspa-pool.org/'
 }
 
+data = webGet_json(url, header=header)
+for worker in data['workers']:
+    print(f'{worker["name"]}   {worker["current_hashrate"]["hashrate"]}{worker["current_hashrate"]["hashrate_unit"]} (30 min)')
