@@ -9,3 +9,13 @@ def send_message(WEBHOOK, text):
     except:
         return -1
     return 1
+
+def connectionTest(WEBHOOK):
+    data = {
+        "content" : '',
+    }
+    try:
+        requests.post(WEBHOOK, json=data)
+    except:
+        return -1
+    return 1

@@ -1,13 +1,19 @@
 import sys
 import random
+import time
+from datetime import datetime
 import threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 import DB
+import Web
 import Discord
 
 RESTARTCODE = 100
+ERRORTEXT = 'ERROR::-1'
+
 STOP_BTN_NAME = 'Stop'
 START_BTN_NAME = 'Start'
 OPTION_GB_NAME = 'Option'
@@ -20,6 +26,15 @@ WINDOWSIZE_V = 580
 OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Adding device', 'Removing device']
 OPTION_INFO_LIST = ['Device / Mining pool', 'time', 'Hash', 'Discovered problem', 'Presumptive problem']
 
+def toRed(st):
+    return f'<span style=\" color: red;\">{st}</span>'
+
+def toBlue(st):
+    return f'<span style=\" color: blue;\">{st}</span>'
+
+def toGreen(st):
+    return f'<span style=\" color: green;\">{st}</span>'
+
 # get random 4 digit number
 def getVerifyingCode():
     code = ''
@@ -27,6 +42,55 @@ def getVerifyingCode():
         code += str(random.randrange(0, 10))
     return code
 
+def getCurrentTime():
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+def getSetting(webhook, time, when_seq, info_seq):
+    OK = toBlue('O')
+    NO = toRed('X')
+
+    stList = []
+    stList.append('[Webhook]')
+    stList.append(f') {webhook}')
+    if Discord.connectionTest(webhook) == -1:
+        stList.append(ERRORTEXT)
+        return stList
+    
+    stList.append('[Checking time]')
+    stList.append(f') {time}')
+
+    stList.append('[When]')
+    for i in range(0, len(OPTION_WHEN_LIST)):
+        st = f') {OPTION_WHEN_LIST[i]} '
+        if when_seq[i] == '1':
+            st += OK
+        else:
+            st += NO
+        stList.append(st)
+        
+    stList.append('[Info]')
+    for i in range(0, len(OPTION_INFO_LIST)):
+        st = f') {OPTION_INFO_LIST[i]} '
+        if info_seq[i] == '1':
+            st += OK
+        else:
+            st += NO
+        stList.append(st)
+    
+    return stList
+
+def getErrorTxt(text):
+    return toRed(f'Error occurred :: \"{text}\"')
+
+def getOneNetworkState(idx):
+    webreturn = Web.connection_test(Web.WEBSITE_LIST[idx])
+    if webreturn == 200:
+        return f'-> {toGreen("Connected")}'
+    else:
+        return f'-> {toRed(f"Disconnected {webreturn}")}'
+        
+
+# check the DataBase option setting format
 def CheckingData():
     print('CheckingData()::Checking the Data format from option DataBase')
     when_seq = DB.loadWhen()
@@ -38,12 +102,52 @@ def CheckingData():
         return False
     print(' = Clear')
     return True
+    
+
 
 class MyWindow(QWidget):
 
+    # print to console
+    def console_out(self, text):
+        console = self.findChild(QTextEdit)
+        QCoreApplication.processEvents()
+        console.append(text)
+        self.repaint()
+
+    # start main function
     def run(self):
-        browser = self.findChild(QTextBrowser)
-        browser.append('start')
+        self.console_out(f'=== Program start === <{getCurrentTime()}>')
+        self.console_out(f'')
+
+        ### load and print option setting
+        # load
+        self.console_out('Loading data ...')
+        webhook = DB.loadWEBHOOK()
+        when_seq = DB.loadWhen()
+        info_seq = DB.loadInfo()
+        time = DB.loadCheckingTime()
+        # print
+        stList = getSetting(webhook, time, when_seq, info_seq)
+        for st in stList:
+            if st == ERRORTEXT:
+                self.console_out('-> ' + toRed(f"Disconnected"))
+                self.console_out(getErrorTxt('The Webhook Link is not available'))
+                return
+            else:
+                self.console_out(st)
+        self.console_out('')
+        
+        ### check network connection in web site List
+        print('Network state')
+        self.console_out('Network state')
+        for i in range(0, len(Web.WEBSITE_LIST)):
+            self.console_out(Web.WEBSITE_LIST[i])
+            self.console_out(getOneNetworkState(i))
+    
+    # quit main function
+    def exit(self):
+        browser = self.findChild(QTextEdit)
+        browser.clear()
 
     def __init__(self):
         super().__init__()
@@ -56,6 +160,7 @@ class MyWindow(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
     
+    # Show notification window - Option setting reset
     def occurData_Format_problem(self):
         QMessageBox.information(self, 'Information', 'Option setting was reset.\nBecause option Data from DataBase unmatched the Normal format', QMessageBox.Yes)
 
@@ -81,7 +186,7 @@ class MyWindow(QWidget):
         self.show()
     
 
-
+    # create webhook group box
     def createGroup_webhook(self):
         groupbox = QGroupBox(WEBHOOK_GB_NAME)
         WEBHOOK = DB.loadWEBHOOK()
@@ -106,6 +211,7 @@ class MyWindow(QWidget):
         groupbox.setLayout(vbox)
         return groupbox
     
+    # create option group box
     def createGroup_option(self):
         groupbox = QGroupBox(OPTION_GB_NAME)
 
@@ -166,6 +272,7 @@ class MyWindow(QWidget):
 
         return groupbox
     
+    # create menu group box
     def createGroup_menu(self):
         groupbox = QGroupBox()
         groupbox.setFlat(True)
@@ -196,12 +303,12 @@ class MyWindow(QWidget):
 
         return groupbox
     
+    # create excute group box
     def createGroup_excute(self):
         groupbox = QGroupBox(CONSOLE_GB_NAME)
         groupbox.setDisabled(True)
 
-        txtBrowser_consol = QTextBrowser()
-        txtBrowser_consol.setOpenExternalLinks(True)
+        txtBrowser_consol = QTextEdit()
 
         vbox = QVBoxLayout()
         vbox.addWidget(txtBrowser_consol)
@@ -211,7 +318,6 @@ class MyWindow(QWidget):
 
 
     def btn_start_function(self):
-        self.run()
         print('start function')
         button_list = self.findChildren(QPushButton)
         for button in button_list:
@@ -226,8 +332,12 @@ class MyWindow(QWidget):
                 qGroupBox.setDisabled(True)
             elif qGroupBox.title() == CONSOLE_GB_NAME:
                 qGroupBox.setEnabled(True)
+        
+        self.run()
+        self.console_out('program ended')
 
     def btn_stop_function(self):
+        self.exit()
         print('stop function')
         button_list = self.findChildren(QPushButton)
         for button in button_list:
