@@ -1,8 +1,9 @@
 import sys
 import random
 import time
-from datetime import datetime
+import datetime
 import threading
+from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -16,6 +17,9 @@ ERRORTEXT = 'ERROR::-1'
 
 STOP_BTN_NAME = 'Stop'
 START_BTN_NAME = 'Start'
+QUIT_BTN_NAME = 'Quit'
+RESTART_BTN_NAME = 'Restart'
+
 OPTION_GB_NAME = 'Option'
 WEBHOOK_GB_NAME = 'WebHook'
 CONSOLE_GB_NAME = 'Excution Console'
@@ -26,38 +30,40 @@ WINDOWSIZE_V = 580
 OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Adding device', 'Removing device']
 OPTION_INFO_LIST = ['Device / Mining pool', 'time', 'Hash', 'Discovered problem', 'Presumptive problem']
 
-def toRed(st):
-    return f'<span style=\" color: red;\">{st}</span>'
+def getNowTime():
+    return datetime.datetime.now()
 
-def toBlue(st):
-    return f'<span style=\" color: blue;\">{st}</span>'
+def getAddedTime(min):
+    return getNowTime() + datetime.timedelta(minutes=min)
 
-def toGreen(st):
-    return f'<span style=\" color: green;\">{st}</span>'
+class Style:
+    def toLine(st):
+        return f'<u>{st}</u>'
 
-# get random 4 digit number
-def getVerifyingCode():
-    code = ''
-    for _ in range(0, 4):
-        code += str(random.randrange(0, 10))
-    return code
+    def toRed(st):
+        return f'<span style=\" color: red;\">{st}</span>'
 
-def getCurrentTime():
-    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    def toBlue(st):
+        return f'<span style=\" color: blue;\">{st}</span>'
+
+    def toGreen(st):
+        return f'<span style=\" color: green;\">{st}</span>'
+
+
 
 def getSetting(webhook, time, when_seq, info_seq):
-    OK = toBlue('O')
-    NO = toRed('X')
+    OK = Style.toBlue('O')
+    NO = Style.toRed('X')
 
     stList = []
     stList.append('[Webhook]')
-    stList.append(f') {webhook}')
+    stList.append(f') {Style.toLine(webhook)}')
     if Discord.connectionTest(webhook) == -1:
         stList.append(ERRORTEXT)
         return stList
     
     stList.append('[Checking time]')
-    stList.append(f') {time}')
+    stList.append(f') {time} (min)')
 
     stList.append('[When]')
     for i in range(0, len(OPTION_WHEN_LIST)):
@@ -80,15 +86,14 @@ def getSetting(webhook, time, when_seq, info_seq):
     return stList
 
 def getErrorTxt(text):
-    return toRed(f'Error occurred :: \"{text}\"')
+    return Style.toRed(f'Error occurred :: \"{text}\"')
 
 def getOneNetworkState(idx):
     webreturn = Web.connection_test(Web.WEBSITE_LIST[idx])
     if webreturn == 200:
-        return f'-> {toGreen("Connected")}'
+        return f'-> {Style.toGreen("Connected")}'
     else:
-        return f'-> {toRed(f"Disconnected {webreturn}")}'
-        
+        return f'-> {Style.toRed(f"Disconnected {webreturn}")}'
 
 # check the DataBase option setting format
 def CheckingData():
@@ -102,56 +107,55 @@ def CheckingData():
         return False
     print(' = Clear')
     return True
+
+class Timer(QThread):
+    checking_signal = pyqtSignal()
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.on = True
+        self.sec = 0
+        self.target_sec = -1
     
+    def run(self):
+        print('Start running Timer')
+        print(f'self.target_sec = {self.target_sec}')
+        while self.on == True:
+            time.sleep(1)
+            self.sec += 1
+            print(f'time.. {self.sec}')
+
+            if self.sec >= self.target_sec:
+                print(f'Checking signal emit !!')
+                self.checking_signal.emit()
+                self.sec = 0
+    
+    def end(self):
+        self.on = False
+        self.quit()
+        self.wait(5000)
+        self.sec = 0
 
 
 class MyWindow(QWidget):
 
-    # print to console
-    def console_out(self, text):
-        console = self.findChild(QTextEdit)
-        QCoreApplication.processEvents()
-        console.append(text)
-        self.repaint()
-
-    # start main function
-    def run(self):
-        self.console_out(f'=== Program start === <{getCurrentTime()}>')
-        self.console_out(f'')
-
-        ### load and print option setting
-        # load
-        self.console_out('Loading data ...')
-        webhook = DB.loadWEBHOOK()
-        when_seq = DB.loadWhen()
-        info_seq = DB.loadInfo()
-        time = DB.loadCheckingTime()
-        # print
-        stList = getSetting(webhook, time, when_seq, info_seq)
-        for st in stList:
-            if st == ERRORTEXT:
-                self.console_out('-> ' + toRed(f"Disconnected"))
-                self.console_out(getErrorTxt('The Webhook Link is not available'))
-                return
-            else:
-                self.console_out(st)
-        self.console_out('')
-        
-        ### check network connection in web site List
-        print('Network state')
-        self.console_out('Network state')
-        for i in range(0, len(Web.WEBSITE_LIST)):
-            self.console_out(Web.WEBSITE_LIST[i])
-            self.console_out(getOneNetworkState(i))
-    
-    # quit main function
-    def exit(self):
-        browser = self.findChild(QTextEdit)
-        browser.clear()
-
     def __init__(self):
         super().__init__()
-        self.init()
+        self.initUI()
+
+        self.console = self.findChild(QTextEdit)
+        self.gb_webhook = self.findChildren(QGroupBox)[0]
+        self.gb_option = self.findChildren(QGroupBox)[1]
+        self.gb_console = self.findChildren(QGroupBox)[3]
+
+        self.btn_quit = self.findChildren(QPushButton)[4]
+        self.btn_restart = self.findChildren(QPushButton)[5]
+        self.btn_start = self.findChildren(QPushButton)[6]
+        self.btn_stop = self.findChildren(QPushButton)[7]
+        
+        self.timer = Timer(self)
+        self.timer.checking_signal.connect(self.run_process_check)
     
     # Move this window to middle of screen
     def center(self):
@@ -160,16 +164,10 @@ class MyWindow(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
     
-    # Show notification window - Option setting reset
-    def occurData_Format_problem(self):
-        QMessageBox.information(self, 'Information', 'Option setting was reset.\nBecause option Data from DataBase unmatched the Normal format', QMessageBox.Yes)
-
-
-
     # window initialize function
-    def init(self):
+    def initUI(self):
         if CheckingData() == False:
-            self.occurData_Format_problem()
+            QMessageBox.information(self, 'Information', 'Option setting was reset.\nBecause option Data from DataBase unmatched the Normal format', QMessageBox.Yes)
         grid = QGridLayout()
         grid.addWidget(self.createGroup_webhook(), 0, 0)
         grid.addWidget(self.createGroup_option(), 1, 0)
@@ -185,6 +183,62 @@ class MyWindow(QWidget):
 
         self.show()
     
+
+
+    # print to console
+    def console_out(self, text):
+        QCoreApplication.processEvents()
+        self.console.append(text)
+        self.console.repaint()
+
+    def run_process_init(self):
+        self.btn_stop.setDisabled(True) # freeze
+
+        print('strat Thread_run')
+        ### program start
+        self.console_out(f'=== Program start === <{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}>')
+        self.console_out(f'')
+
+        ### load and print option setting
+        # load
+        self.console_out('Loading data ...')
+        webhook = DB.loadWEBHOOK()
+        when_seq = DB.loadWhen()
+        info_seq = DB.loadInfo()
+        checktime = DB.loadCheckingTime()
+        # print
+        stList = getSetting(webhook, checktime, when_seq, info_seq)
+        for st in stList:
+            if st == ERRORTEXT:
+                self.console_out('-> ' + Style.toRed(f"Disconnected"))
+                self.console_out(getErrorTxt('The Webhook Link is not available'))
+                return
+            else:
+                self.console_out(st)
+        self.console_out('')
+        
+        ### check network connection in web site List
+        self.console_out(f'Checking Network connection ({len(Web.WEBSITE_LIST)})')
+        for i in range(0, len(Web.WEBSITE_LIST)):
+            self.console_out(f'[{i + 1}/{len(Web.WEBSITE_LIST)}] {Web.WEBSITE_LIST[i]}')
+            self.console_out(getOneNetworkState(i))
+
+        self.btn_stop.setEnabled(True) # unfreeze
+
+    def run_process_check(self):
+        self.console_out('Checking ... ')
+        time.sleep(2)
+        self.console_out('Done !')
+
+    def run(self):
+        #self.run_process_init()
+        self.timer.on = True
+        #self.timer.target_sec = int(DB.loadCheckingTime()) * 60
+        self.timer.target_sec = 5
+        self.timer.start()
+
+    def run_process_exit(self):
+        self.timer.end()
 
     # create webhook group box
     def createGroup_webhook(self):
@@ -277,9 +331,9 @@ class MyWindow(QWidget):
         groupbox = QGroupBox()
         groupbox.setFlat(True)
 
-        btn_quit = QPushButton('Quit')
+        btn_quit = QPushButton(QUIT_BTN_NAME)
         btn_quit.clicked.connect(self.btn_quit_function)
-        btn_restart = QPushButton('Restart')
+        btn_restart = QPushButton(RESTART_BTN_NAME)
         btn_restart.clicked.connect(self.btn_restart_function)
 
         vbox_L = QVBoxLayout()
@@ -317,41 +371,32 @@ class MyWindow(QWidget):
         return groupbox
 
 
+
     def btn_start_function(self):
-        print('start function')
-        button_list = self.findChildren(QPushButton)
-        for button in button_list:
-            if button.text() == STOP_BTN_NAME:
-                button.setEnabled(True)
-            elif button.text() == START_BTN_NAME:
-                button.setDisabled(True)
+        self.btn_stop.setEnabled(True)
+        self.btn_quit.setDisabled(True)
+        self.btn_restart.setDisabled(True)
+        self.btn_start.setDisabled(True)
         
-        qGroupBox_List = self.findChildren(QGroupBox)
-        for qGroupBox in qGroupBox_List:
-            if qGroupBox.title() == OPTION_GB_NAME or qGroupBox.title() == WEBHOOK_GB_NAME:
-                qGroupBox.setDisabled(True)
-            elif qGroupBox.title() == CONSOLE_GB_NAME:
-                qGroupBox.setEnabled(True)
-        
+        self.gb_webhook.setDisabled(True)
+        self.gb_option.setDisabled(True)
+        self.gb_console.setEnabled(True)
+
         self.run()
-        self.console_out('program ended')
 
     def btn_stop_function(self):
-        self.exit()
-        print('stop function')
-        button_list = self.findChildren(QPushButton)
-        for button in button_list:
-            if button.text() == START_BTN_NAME:
-                button.setEnabled(True)
-            elif button.text() == STOP_BTN_NAME:
-                button.setDisabled(True)
-                
-        qGroupBox_List = self.findChildren(QGroupBox)
-        for qGroupBox in qGroupBox_List:
-            if qGroupBox.title() == OPTION_GB_NAME or qGroupBox.title() == WEBHOOK_GB_NAME:
-                qGroupBox.setEnabled(True)
-            elif qGroupBox.title() == CONSOLE_GB_NAME:
-                qGroupBox.setDisabled(True)
+        self.console_out('Close the Program . . .')
+        self.btn_stop.setDisabled(True)
+        self.btn_quit.setEnabled(True)
+        self.btn_restart.setEnabled(True)
+        self.btn_start.setEnabled(True)
+        
+        self.gb_webhook.setEnabled(True)
+        self.gb_option.setEnabled(True)
+        self.gb_console.setDisabled(True)
+        
+        self.console.clear()
+        self.run_process_exit()
 
     def btn_quit_function(self):
         qApp.exit(0)
@@ -374,7 +419,9 @@ class MyWindow(QWidget):
     
     def btn_ConnectionTest_function(self):
         WEBHOOK = DB.loadWEBHOOK()
-        verifyingCode = getVerifyingCode()
+        verifyingCode = ''
+        for _ in range(0, 4):
+            verifyingCode += str(random.randrange(0, 10))
         program = Discord.send_message(WEBHOOK, f'VerifyingCode : {verifyingCode}')
         if program == -1:
             QMessageBox.warning(self, 'Webhook Error', f'The Webhook link is not work. Check the Webhook Link')
@@ -429,3 +476,5 @@ if __name__ == "__main__":
         else:
             print('Quit the program')
             break
+    
+        

@@ -1,11 +1,7 @@
 import requests
 import json
 
-WEBSITE_LIST = ['https://kaspa-pool.org/api/user/workers/?wallet=kaspa:qp29mc9qzdpyq6kjwnvw450vewylk8szej3mju8lwt40h995xm7pxx7pwq08z',
-                'https://www.google.com',
-                'https://solved.ac/profile/kookjd7759',
-                'sdfasdfasdfas',
-                'we4iotruq23p43oghvndsa',]
+WEBSITE_LIST = ['https://kaspa-pool.org/api/user/workers/?wallet=kaspa:qp29mc9qzdpyq6kjwnvw450vewylk8szej3mju8lwt40h995xm7pxx7pwq08z']
 
 def connection_test(url):
     try:
