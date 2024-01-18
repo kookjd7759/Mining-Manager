@@ -49,6 +49,9 @@ class Style:
     def toGreen(st):
         return f'<span style=\" color: green;\">{st}</span>'
 
+    def toBold(st):
+        return f'<strong>{st}</strong>'
+
 
 
 def getSetting(webhook, time, when_seq, info_seq):
@@ -191,21 +194,34 @@ class MyWindow(QWidget):
         self.console.append(text)
         self.console.repaint()
 
+    def run_process_check(self):
+        self.btn_stop.setDisabled(True) # freeze
+
+        #nextTime = getAddedTime(int(DB.loadCheckingTime) * 60).strftime("%Y-%m-%d %H:%M:%S")
+        nowTime = getNowTime().strftime("%H:%M:%S (%Y-%m-%d)")
+        nextTime = getAddedTime(10).strftime("%H:%M:%S (%Y-%m-%d)")
+        self.console_out('[Start checking the connection status]')
+        self.console_out(f'Current time : {nowTime}')
+        time.sleep(2)
+        self.console_out('print result (no problem/add/delete/connection loss)')
+        self.console_out(Style.toBold(f'Next checking time : {nextTime}'))
+        self.console_out('')
+
+        self.btn_stop.setEnabled(True) # unfreeze
+
     def run_process_init(self):
         self.btn_stop.setDisabled(True) # freeze
 
-        print('strat Thread_run')
         ### program start
-        self.console_out(f'=== Program start === <{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}>')
-        self.console_out(f'')
+        self.console_out(f'=== Program start === <{getNowTime().strftime("%Y-%m-%d %H:%M:%S")}>\n')
 
         ### load and print option setting
         # load
         self.console_out('Loading data ...')
         webhook = DB.loadWEBHOOK()
+        checktime = DB.loadCheckingTime()
         when_seq = DB.loadWhen()
         info_seq = DB.loadInfo()
-        checktime = DB.loadCheckingTime()
         # print
         stList = getSetting(webhook, checktime, when_seq, info_seq)
         for st in stList:
@@ -222,23 +238,25 @@ class MyWindow(QWidget):
         for i in range(0, len(Web.WEBSITE_LIST)):
             self.console_out(f'[{i + 1}/{len(Web.WEBSITE_LIST)}] {Web.WEBSITE_LIST[i]}')
             self.console_out(getOneNetworkState(i))
+        self.console_out('')
 
         self.btn_stop.setEnabled(True) # unfreeze
 
-    def run_process_check(self):
-        self.console_out('Checking ... ')
-        time.sleep(2)
-        self.console_out('Done !')
-
-    def run(self):
-        #self.run_process_init()
+    def run_process_mainLoop(self):
+        self.run_process_check()
         self.timer.on = True
         #self.timer.target_sec = int(DB.loadCheckingTime()) * 60
-        self.timer.target_sec = 5
+        self.timer.target_sec = 10
         self.timer.start()
+    
+    def run(self):
+        self.run_process_init()
+        self.run_process_mainLoop()
 
     def run_process_exit(self):
         self.timer.end()
+
+
 
     # create webhook group box
     def createGroup_webhook(self):
@@ -470,6 +488,7 @@ if __name__ == "__main__":
     while True:
         ex = MyWindow()
         program_return = app.exec_()
+        ex.close()
         if program_return == RESTARTCODE:
             print('Program restarting ...')
             continue
