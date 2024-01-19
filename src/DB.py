@@ -111,8 +111,8 @@ def saveWhen(seq):
 def Reset_default_values():
     print('DB::Reset_default_values():: Reset default values')
     saveCheckingTime(CheckingTime_list[2])
-    saveInfo('00000')
-    saveWhen('000')
+    saveInfo('11000')
+    saveWhen('100')
 
 # name = File name without '.txt'
 # workers = worker List

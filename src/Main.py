@@ -12,6 +12,8 @@ import DB
 import Web
 import Discord
 
+VERSION = 'v1.0.0-Alpha'
+
 RESTARTCODE = 100
 ERRORTEXT = 'ERROR::-1'
 
@@ -27,7 +29,7 @@ CONSOLE_GB_NAME = 'Excution Console'
 WINDOWSIZE_H = 900
 WINDOWSIZE_V = 580
 
-OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Adding device', 'Removing device']
+OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Add device', 'Remove device']
 OPTION_INFO_LIST = ['Device / Mining pool', 'time', 'Hash', 'Discovered problem', 'Presumptive problem']
 
 def getNowTime():
@@ -35,6 +37,8 @@ def getNowTime():
 
 def getAddedTime(min):
     return getNowTime() + datetime.timedelta(minutes=min)
+
+
 
 class Style:
     def toLine(st):
@@ -111,6 +115,8 @@ def CheckingData():
     print(' = Clear')
     return True
 
+
+
 class Timer(QThread):
     checking_signal = pyqtSignal()
 
@@ -174,12 +180,13 @@ class MyWindow(QWidget):
         grid = QGridLayout()
         grid.addWidget(self.createGroup_webhook(), 0, 0)
         grid.addWidget(self.createGroup_option(), 1, 0)
-        grid.addWidget(self.createGroup_menu(), 2, 0)
+        grid.addWidget(self.createGroup_myMenu(), 2, 0)
         grid.addWidget(self.createGroup_excute(), 3, 0)
+
         self.setLayout(grid)
 
         self.setWindowIcon(QIcon('./Mining Manager/Image/Icon/Title_Icon.png'))
-        self.setWindowTitle('Mining Manager')
+        self.setWindowTitle(f'Mining Manager {VERSION}')
         self.setMaximumSize(WINDOWSIZE_H, WINDOWSIZE_V)
         self.setMinimumSize(WINDOWSIZE_H, WINDOWSIZE_V)
         self.center()
@@ -197,10 +204,10 @@ class MyWindow(QWidget):
     def run_process_check(self):
         self.btn_stop.setDisabled(True) # freeze
 
-        #nextTime = getAddedTime(int(DB.loadCheckingTime) * 60).strftime("%Y-%m-%d %H:%M:%S")
         nowTime = getNowTime().strftime("%H:%M:%S (%Y-%m-%d)")
-        nextTime = getAddedTime(10).strftime("%H:%M:%S (%Y-%m-%d)")
-        self.console_out('[Start checking the connection status]')
+        nextTime = getAddedTime(int(DB.loadCheckingTime())).strftime("%Y-%m-%d %H:%M:%S")
+
+        self.console_out(Style.toBold('Start checking'))
         self.console_out(f'Current time : {nowTime}')
         time.sleep(2)
         self.console_out('print result (no problem/add/delete/connection loss)')
@@ -245,8 +252,7 @@ class MyWindow(QWidget):
     def run_process_mainLoop(self):
         self.run_process_check()
         self.timer.on = True
-        #self.timer.target_sec = int(DB.loadCheckingTime()) * 60
-        self.timer.target_sec = 10
+        self.timer.target_sec = int(DB.loadCheckingTime()) * 60
         self.timer.start()
     
     def run(self):
@@ -257,7 +263,7 @@ class MyWindow(QWidget):
         self.timer.end()
 
 
-
+    
     # create webhook group box
     def createGroup_webhook(self):
         groupbox = QGroupBox(WEBHOOK_GB_NAME)
@@ -345,7 +351,7 @@ class MyWindow(QWidget):
         return groupbox
     
     # create menu group box
-    def createGroup_menu(self):
+    def createGroup_myMenu(self):
         groupbox = QGroupBox()
         groupbox.setFlat(True)
 
