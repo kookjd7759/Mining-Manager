@@ -1,3 +1,5 @@
+import Web
+
 DBPATH = './Mining Manager/DataBase/'
 WEBHOOK_DB_NAME = 'WEBHOOK'
 CHECKINGTIME_DB_NAME = 'Option_time'
@@ -15,6 +17,16 @@ def mktxt(name):
     file.write('')
     file.close()
 
+
+def DBinit():
+    for key in Web.Url_dictionary:
+        url = getPath(key)
+        try:
+            file = open(url, 'r')
+        except FileNotFoundError:
+            file = open(url, 'w')
+            file.write('')
+        file.close()
 
 def loadWEBHOOK():
     url = getPath(WEBHOOK_DB_NAME)
@@ -117,9 +129,9 @@ def Reset_default_values():
 # name = File name without '.txt'
 # workers = worker List
 ## save or update the DataBase 
-def saveDB(name, workers):
-    print(f'Start save DB \"{name}.txt\" ... ')
-    url = getPath(name)
+def saveDB(key, workers):
+    print(f'Start save DB \"{key}.txt\" ... ')
+    url = getPath(key)
     file = open(url, 'w')
     for worker in workers:
         file.write(f'{worker}\n')
@@ -128,9 +140,9 @@ def saveDB(name, workers):
 
 # name = file Name without '.txt'
 ## load the DataBase 
-def loadDB(name):
-    print(f'Start load DB \"{name}.txt\" ... ')
-    url = getPath(name)
+def loadDB(key):
+    print(f'Start load DB \"{key}.txt\" ... ')
+    url = getPath(key)
     file = open(url, 'r')
     resultList = []
     while True:
@@ -144,3 +156,7 @@ def loadDB(name):
 
     return resultList
 
+
+
+if __name__ == "__main__":
+    DBinit()

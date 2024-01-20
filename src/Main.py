@@ -11,6 +11,7 @@ from PyQt5.QtCore import *
 import DB
 import Web
 import Discord
+import Style
 
 VERSION = 'v1.0.0-Alpha'
 
@@ -40,31 +41,13 @@ def getAddedTime(min):
 
 
 
-class Style:
-    def toLine(st):
-        return f'<u>{st}</u>'
-
-    def toRed(st):
-        return f'<span style=\" color: red;\">{st}</span>'
-
-    def toBlue(st):
-        return f'<span style=\" color: blue;\">{st}</span>'
-
-    def toGreen(st):
-        return f'<span style=\" color: green;\">{st}</span>'
-
-    def toBold(st):
-        return f'<strong>{st}</strong>'
-
-
-
 def getSetting(webhook, time, when_seq, info_seq):
     OK = Style.toBlue('O')
     NO = Style.toRed('X')
 
     stList = []
     stList.append('[Webhook]')
-    stList.append(f') {Style.toLine(webhook)}')
+    stList.append(f') {Style.toLink(webhook)}')
     if Discord.connectionTest(webhook) == -1:
         stList.append(ERRORTEXT)
         return stList
@@ -95,8 +78,8 @@ def getSetting(webhook, time, when_seq, info_seq):
 def getErrorTxt(text):
     return Style.toRed(f'Error occurred :: \"{text}\"')
 
-def getOneNetworkState(idx):
-    webreturn = Web.connection_test(Web.WEBSITE_LIST[idx])
+def getOneNetworkState(key):
+    webreturn = Web.connection_test(Web.Url_dictionary[key][0])
     if webreturn == 200:
         return f'-> {Style.toGreen("Connected")}'
     else:
@@ -151,7 +134,7 @@ class MyWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.init()
 
         self.console = self.findChild(QTextEdit)
         self.gb_webhook = self.findChildren(QGroupBox)[0]
@@ -174,7 +157,8 @@ class MyWindow(QWidget):
         self.move(qr.topLeft())
     
     # window initialize function
-    def initUI(self):
+    def init(self):
+        DB.DBinit()
         if CheckingData() == False:
             QMessageBox.information(self, 'Information', 'Option setting was reset.\nBecause option Data from DataBase unmatched the Normal format', QMessageBox.Yes)
         grid = QGridLayout()
@@ -209,8 +193,17 @@ class MyWindow(QWidget):
 
         self.console_out(Style.toBold('Start checking'))
         self.console_out(f'Current time : {nowTime}')
-        time.sleep(2)
-        self.console_out('print result (no problem/add/delete/connection loss)')
+
+        ### Main checking roop start
+        for key in Web.Url_dictionary:
+            self.console_out(Style.toBold(Style.toLink(key)))
+            workerList = Web.getList(key)
+            workerStr = f'Worker List : {str(workerList)}'
+            
+            self.console_out(f'Workers Size : {len(workerList)}')
+            self.console_out(workerStr)
+        ### Main checking roop end
+            
         self.console_out(Style.toBold(f'Next checking time : {nextTime}'))
         self.console_out('')
 
@@ -241,10 +234,13 @@ class MyWindow(QWidget):
         self.console_out('')
         
         ### check network connection in web site List
-        self.console_out(f'Checking Network connection ({len(Web.WEBSITE_LIST)})')
-        for i in range(0, len(Web.WEBSITE_LIST)):
-            self.console_out(f'[{i + 1}/{len(Web.WEBSITE_LIST)}] {Web.WEBSITE_LIST[i]}')
-            self.console_out(getOneNetworkState(i))
+        self.console_out(f'Checking Network connection ({len(Web.Url_dictionary)})')
+        idx = 1
+        for key in Web.Url_dictionary:
+            self.console_out(f'[{idx}/{len(Web.Url_dictionary)}] {key}')
+            self.console_out(f'url : {Style.toLink(Web.Url_dictionary[key][0])}')
+            self.console_out(getOneNetworkState(key))
+            idx += 1
         self.console_out('')
 
         self.btn_stop.setEnabled(True) # unfreeze
@@ -384,10 +380,8 @@ class MyWindow(QWidget):
     # create excute group box
     def createGroup_excute(self):
         groupbox = QGroupBox(CONSOLE_GB_NAME)
-        groupbox.setDisabled(True)
-
         txtBrowser_consol = QTextEdit()
-
+        txtBrowser_consol.setReadOnly(True)
         vbox = QVBoxLayout()
         vbox.addWidget(txtBrowser_consol)
         groupbox.setLayout(vbox)
@@ -397,6 +391,8 @@ class MyWindow(QWidget):
 
 
     def btn_start_function(self):
+        self.console.clear()
+
         self.btn_stop.setEnabled(True)
         self.btn_quit.setDisabled(True)
         self.btn_restart.setDisabled(True)
@@ -404,7 +400,6 @@ class MyWindow(QWidget):
         
         self.gb_webhook.setDisabled(True)
         self.gb_option.setDisabled(True)
-        self.gb_console.setEnabled(True)
 
         self.run()
 
@@ -417,9 +412,7 @@ class MyWindow(QWidget):
         
         self.gb_webhook.setEnabled(True)
         self.gb_option.setEnabled(True)
-        self.gb_console.setDisabled(True)
         
-        self.console.clear()
         self.run_process_exit()
 
     def btn_quit_function(self):
