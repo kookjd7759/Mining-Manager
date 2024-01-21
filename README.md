@@ -6,7 +6,7 @@
 - Mining Pool 과 Device 와의 Network Connection, Worker의 동작 상태를 모니터링해 문제 발생시 사용자에게 알림을 보냅니다.
 - (기능 추가 예정) 전체 채굴 현황을 요약하여 사용자에게 전송합니다.
 
-- 지원하는 Mining Pool
+- 지원하는 Mining Pool (추가 예정)
   - [kaspa-pool.org](https://kaspa-pool.org)
   - [kas.2miners.com](https://kas.2miners.com)
 
