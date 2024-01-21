@@ -11,7 +11,15 @@
 - Back-end : Web Request, Discord API, python
 
 ## 기능
+설정한 옵션을 따라 Network 및 Worker 상태를 모니터링 하고, Discord Webhook을 통해 사용자에게 알림을 전송
 ### 전체 실행 화면
 ![Mining Manager v1 0 0-Alpha 실행 화면](https://github.com/kookjd7759/Mining-Manager/assets/67672017/e6bad2bc-7b0c-4048-9bd5-078596bb2502)
 
-#### 세부 기능
+### 세부 기능
+#### Webhook Menu
+![Mining Manager v1 0 0-Alpha 웹훅 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/d3b26765-7a19-4fb6-b0f0-59240e31e1f7)
+
+- 저장된 Webhook Link를 표시하며 다음과 같은 수행을 한다.
+- Edit : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
+- Delete : Webhook Link를 삭제 
+- Connection Test : 해당 
