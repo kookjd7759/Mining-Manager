@@ -21,9 +21,9 @@
 
 Webhook Link와 관련한 메뉴 창
 - 저장된 Webhook Link를 표시
-- Edit : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
-- Delete : Webhook Link를 삭제 
-- Connection Test : 해당 Webhook Link를 통해 Test message(인증 코드 4자리) 전송
+- [Edit] : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
+- [Delete] : Webhook Link를 삭제 
+- [Connection Test] : 해당 Webhook Link를 통해 Test message(인증 코드 4자리) 전송
 
 #### Option Menu
 ![Mining Manager v1 0 0-Alpha 옵션 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/1feb4cf8-2910-43bc-b2e4-6763efc0ddf2)
