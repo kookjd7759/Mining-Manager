@@ -17,9 +17,9 @@
 
 ### 세부 기능
 #### Webhook Menu
-![Mining Manager v1 0 0-Alpha 웹훅 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/d3b26765-7a19-4fb6-b0f0-59240e31e1f7)
+![Mining Manager v1 0 0-Alpha 웹훅 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/d58983a4-775f-44d2-8884-f9f926e96305)
 
-- 저장된 Webhook Link를 표시하며 다음과 같은 수행을 한다.
+- 저장된 Webhook Link를 표시
 - Edit : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
 - Delete : Webhook Link를 삭제 
 - Connection Test : 해당 
