@@ -201,19 +201,51 @@ class MyWindow(QWidget):
             ### Web start
             self.console_out('[Web]')
             workerList_web = Web.getList(key)
+            workerNameList_web = []
+            for worker in workerList_web:
+                workerNameList_web.append(worker[0])
             self.console_out(f'Size : {len(workerList_web)}')
-            self.console_out(f'List : {str(workerList_web)}')
+            self.console_out(f'List : {str(workerNameList_web)}')
             ### Web end
 
             ### DB start
             self.console_out('[DB]')
-            workerList_DB = DB.loadDB(key)
-            self.console_out(f'Size : {len(workerList_DB)}')
-            self.console_out(f'List : {str(workerList_DB)}')
+            workerNameList_DB = DB.loadDB(key)
+            self.console_out(f'Size : {len(workerNameList_DB)}')
+            self.console_out(f'List : {str(workerNameList_DB)}')
             ### DB end
 
             ### sync start
-            
+            if len(workerNameList_web) > len(workerNameList_DB): # Add device
+                print('Add device !!')
+                addedList = []
+                for web_worker in workerNameList_web:
+                    if web_worker not in workerNameList_DB:
+                        workerNameList_DB.append(web_worker)
+                        addedList.append(web_worker)
+                self.console_out(Style.toBold(Style.toRed(f' >> Add device : {addedList}')))
+                workerNameList_DB.sort()
+                DB.saveDB(key, workerNameList_DB)
+
+            elif len(workerNameList_web) < len(workerNameList_DB): # Remove device
+                print('Remove device !!')
+                DB.saveDB(key, workerNameList_web)
+                self.console_out(Style.toBold(Style.toRed(' >> Remove function')))
+
+            else: # len(workerNameList_web) == len(workerNameList_DB)
+                print('Hash check !!')
+                hashCheckingList = []
+                for worker in workerList_web:
+                    if worker[1] <= 0.2: # 오차 범위 생각해서 0.2TH/s 이하로 떨어진 경우
+                        hashCheckingList.append(worker[0])
+                
+                if len(hashCheckingList) != 0: # 비정상적인 hash를 가진 device가 발견됨
+                    self.console_out(Style.toBold(Style.toRed(f' >> Hashrate is under the 0.2TH/s : {hashCheckingList}')))
+                else:
+                    self.console_out(Style.toBold(Style.toGreen(' >> Clear')))
+
+                        
+
             ### sync end
 
         ### Main checking roop end
