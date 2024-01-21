@@ -20,6 +20,11 @@
 ![Mining Manager v1 0 0-Alpha 웹훅 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/d58983a4-775f-44d2-8884-f9f926e96305)
 
 - 저장된 Webhook Link를 표시
-- Edit : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
-- Delete : Webhook Link를 삭제 
-- Connection Test : 해당 
+  - Edit : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
+  - Delete : Webhook Link를 삭제 
+  - Connection Test : 해당 
+
+#### Option Menu
+![Mining Manager v1 0 0-Alpha 옵션 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/1feb4cf8-2910-43bc-b2e4-6763efc0ddf2)
+
+- 
