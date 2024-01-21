@@ -8,7 +8,7 @@
 
 ## 개발 환경
 - Front-end : PyQt5
-- Back-end : Web Request, Discord API, python
+- Back-end : Web Request, Discord API
 
 ## 기능
 설정한 옵션을 따라 Network 및 Worker 상태를 모니터링 하고, Discord(Discord Webhook Link)를 통해 사용자에게 알림을 전송
