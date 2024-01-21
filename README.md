@@ -11,7 +11,7 @@
 - Back-end : Web Request, Discord API, python
 
 ## 기능
-설정한 옵션을 따라 Network 및 Worker 상태를 모니터링 하고, Discord Webhook을 통해 사용자에게 알림을 전송
+설정한 옵션을 따라 Network 및 Worker 상태를 모니터링 하고, Discord(Discord Webhook Link)를 통해 사용자에게 알림을 전송
 ### 전체 실행 화면
 ![Mining Manager v1 0 0-Alpha 실행 화면](https://github.com/kookjd7759/Mining-Manager/assets/67672017/e6bad2bc-7b0c-4048-9bd5-078596bb2502)
 
@@ -32,6 +32,7 @@ Option 설정이 가능한 메뉴 창
 - Checking Time (min) : 채굴 수행 상태를 확인할 주기를 분 단위로 설정
 - Receive notification when : 알림을 전송할 조건을 설정
 - Receive following information : 수신할 정보를 설정
+- Reset default values : 옵션 설정을 기본값으로 변경
 
 #### Main Menu
 프로그램 동작에 관한 메뉴 창
