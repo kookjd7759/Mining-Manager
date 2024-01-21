@@ -37,20 +37,17 @@ def getList(key):
     if key == KEY_kaspaPool:
         for worker in data['workers']:
             nameList.append(worker['name'])
-        return nameList
     elif key == KEY_kas2miner:
         for name in data['workers']:
             nameList.append(name)
-        return nameList
+    
+    nameList.sort()
+    return nameList
 
 
 
 if __name__ == "__main__":
-    url = Url_dictionary[KEY_kas2miner][0]
-    header = {
-    'referer': Url_dictionary[KEY_kas2miner][1]
-    }
-    data = get_json(url=url, header=header)
-    
-    for i in data['workers']:
-        print(i)
+    workerList = ['32','15']
+    print(workerList)
+    workerList.sort()
+    print(workerList)

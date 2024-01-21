@@ -47,17 +47,17 @@ def getSetting(webhook, time, when_seq, info_seq):
 
     stList = []
     stList.append('[Webhook]')
-    stList.append(f') {Style.toLink(webhook)}')
+    stList.append(f'>> {Style.toLink(webhook)}')
     if Discord.connectionTest(webhook) == -1:
         stList.append(ERRORTEXT)
         return stList
     
     stList.append('[Checking time]')
-    stList.append(f') {time} (min)')
+    stList.append(f'>> {time} (min)')
 
     stList.append('[When]')
     for i in range(0, len(OPTION_WHEN_LIST)):
-        st = f') {OPTION_WHEN_LIST[i]} '
+        st = f'>> {OPTION_WHEN_LIST[i]} '
         if when_seq[i] == '1':
             st += OK
         else:
@@ -66,7 +66,7 @@ def getSetting(webhook, time, when_seq, info_seq):
         
     stList.append('[Info]')
     for i in range(0, len(OPTION_INFO_LIST)):
-        st = f') {OPTION_INFO_LIST[i]} '
+        st = f'>> {OPTION_INFO_LIST[i]} '
         if info_seq[i] == '1':
             st += OK
         else:
@@ -197,11 +197,25 @@ class MyWindow(QWidget):
         ### Main checking roop start
         for key in Web.Url_dictionary:
             self.console_out(Style.toBold(Style.toLink(key)))
-            workerList = Web.getList(key)
-            workerStr = f'Worker List : {str(workerList)}'
+
+            ### Web start
+            self.console_out('[Web]')
+            workerList_web = Web.getList(key)
+            self.console_out(f'Size : {len(workerList_web)}')
+            self.console_out(f'List : {str(workerList_web)}')
+            ### Web end
+
+            ### DB start
+            self.console_out('[DB]')
+            workerList_DB = DB.loadDB(key)
+            self.console_out(f'Size : {len(workerList_DB)}')
+            self.console_out(f'List : {str(workerList_DB)}')
+            ### DB end
+
+            ### sync start
             
-            self.console_out(f'Workers Size : {len(workerList)}')
-            self.console_out(workerStr)
+            ### sync end
+
         ### Main checking roop end
             
         self.console_out(Style.toBold(f'Next checking time : {nextTime}'))
@@ -495,4 +509,3 @@ if __name__ == "__main__":
             print('Quit the program')
             break
     
-        

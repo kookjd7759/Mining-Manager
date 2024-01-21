@@ -157,6 +157,3 @@ def loadDB(key):
     return resultList
 
 
-
-if __name__ == "__main__":
-    DBinit()
