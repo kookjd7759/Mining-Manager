@@ -23,7 +23,7 @@ Webhook Link와 관련한 메뉴 창
 - 저장된 Webhook Link를 표시
 - Edit : Webhook Link를 수정 및 업데이트 (보조 창을 띄워 입력을 받은 후 적용)
 - Delete : Webhook Link를 삭제 
-- Connection Test : 해당 
+- Connection Test : 해당 Webhook Link를 통해 Test message(인증 코드 4자리) 전송
 
 #### Option Menu
 Option 설정이 가능한 메뉴 창
