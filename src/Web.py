@@ -9,6 +9,8 @@ Url_dictionary = {KEY_kaspaPool: [f'https://kaspa-pool.org/api/user/workers/?wal
                 KEY_kas2miner: [f'https://kas.2miners.com/api/accounts/kaspa:{Wallet_kaspa}', f'https://kas.2miners.com/ko/account/kaspa:{Wallet_kaspa}']
                 }
 
+User_url_dictionary = {KEY_kaspaPool: f'https://kaspa-pool.org/#/dashboard/kaspa:{Wallet_kaspa}',
+                       KEY_kas2miner: f'https://kas.2miners.com/ko/account/kaspa:{Wallet_kaspa}'}
 
 def connection_test(url):
     try:
@@ -36,10 +38,18 @@ def getList(key):
     name_hashList = []
     if key == KEY_kaspaPool:
         for worker in data['workers']:
-            name_hashList.append([worker['name'], round(float(worker['current_hashrate']['hashrate']), 2)])
+            hash_TH = float(worker['current_hashrate']['hashrate'])
+            if worker['current_hashrate']['hashrate_unit'] == 'TH/s':
+                hash_TH = round(hash_TH, 2)
+            elif worker['current_hashrate']['hashrate_unit'] == 'GH/s':
+                hash_TH = round(hash_TH / 1000, 2)
+            else:
+                hash_TH = 0.0
+            name_hashList.append([worker['name'], hash_TH])
     elif key == KEY_kas2miner:
         for name in data['workers']:
-            name_hashList.append([name, round(float(data['workers'][name]['hr']) / 1000000000000.0, 2)])
+            hash_TH = round(float(data['workers'][name]['hr']) / 1000000000000.0, 2)
+            name_hashList.append([name, hash_TH])
     
     name_hashList.sort(key=lambda x:x[0]) # 첫번째 값 기준 ('name') 정렬
     return name_hashList

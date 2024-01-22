@@ -2,8 +2,6 @@ import sys
 import random
 import time
 import datetime
-import threading
-from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -30,8 +28,8 @@ CONSOLE_GB_NAME = 'Excution Console'
 WINDOWSIZE_H = 900
 WINDOWSIZE_V = 580
 
-OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Add device', 'Remove device']
-OPTION_INFO_LIST = ['Device / Mining pool', 'time', 'Hash', 'Discovered problem', 'Presumptive problem']
+OPTION_WHEN_LIST = ['Connection loss / Hash reduction', 'Add device', 'Remove device (Recommended)']
+OPTION_INFO_LIST = ['Notification type', 'Device / Mining pool', 'Time', 'Hash', 'Pool detail']
 
 def getNowTime():
     return datetime.datetime.now()
@@ -188,8 +186,8 @@ class MyWindow(QWidget):
     def run_process_check(self):
         self.btn_stop.setDisabled(True) # freeze
 
-        nowTime = getNowTime().strftime("%H:%M:%S (%Y-%m-%d)")
-        nextTime = getAddedTime(int(DB.loadCheckingTime())).strftime("%Y-%m-%d %H:%M:%S")
+        nowTime = getNowTime().strftime("%H시 %M분 %S초 (%Y-%m-%d)")
+        nextTime = getAddedTime(int(DB.loadCheckingTime())).strftime("%H시 %M분 %S초 (%Y-%m-%d)")
 
         self.console_out(Style.toBold('Start checking'))
         self.console_out(f'Current time : {nowTime}')
@@ -216,33 +214,57 @@ class MyWindow(QWidget):
             ### DB end
 
             ### sync start
-            if len(workerNameList_web) > len(workerNameList_DB): # Add device
+            # Add check
+            print('Add check ...')
+            addedList = []
+            for web_worker in workerNameList_web:
+                if web_worker not in workerNameList_DB:
+                    workerNameList_DB.append(web_worker)
+                    addedList.append(web_worker)
+            if len(addedList) != 0: # Add device
                 print('Add device !!')
-                addedList = []
-                for web_worker in workerNameList_web:
-                    if web_worker not in workerNameList_DB:
-                        workerNameList_DB.append(web_worker)
-                        addedList.append(web_worker)
-                self.console_out(Style.toBold(Style.toRed(f' >> Add device : {addedList}')))
+                self.console_out(Style.toBoldRed(f' >> [Add device]'))
+                self.console_out(Style.toBoldRed(f' >> Size : {len(addedList)}'))
+                self.console_out(Style.toBoldRed(f' >> List : {addedList}'))
                 workerNameList_DB.sort()
                 DB.saveDB(key, workerNameList_DB)
-
-            elif len(workerNameList_web) < len(workerNameList_DB): # Remove device
+                Discord.add_alert(DB.loadWEBHOOK(), DB.loadInfo(), addedList, key, nowTime)
+            
+            # Remove check
+            print('Remove check ...')
+            removeList = []
+            for DB_worker in workerNameList_DB:
+                if DB_worker not in workerNameList_web:
+                    removeList.append(DB_worker)
+            for worker in removeList:
+                workerNameList_DB.remove(worker)
+            if len(removeList) != 0: # Remove device
                 print('Remove device !!')
-                DB.saveDB(key, workerNameList_web)
-                self.console_out(Style.toBold(Style.toRed(' >> Remove function')))
+                self.console_out(Style.toBoldRed(' >> [Remove function]'))
+                self.console_out(Style.toBoldRed(f' >> Size : {len(removeList)}'))
+                self.console_out(Style.toBoldRed(f' >> List : {removeList}'))
+                workerNameList_DB.sort()
+                DB.saveDB(key, workerNameList_DB)
+                Discord.remove_alert(DB.loadWEBHOOK(), DB.loadInfo(), removeList, key, nowTime)
 
-            else: # len(workerNameList_web) == len(workerNameList_DB)
-                print('Hash check !!')
-                hashCheckingList = []
-                for worker in workerList_web:
-                    if worker[1] <= 0.2: # 오차 범위 생각해서 0.2TH/s 이하로 떨어진 경우
-                        hashCheckingList.append(worker[0])
-                
-                if len(hashCheckingList) != 0: # 비정상적인 hash를 가진 device가 발견됨
-                    self.console_out(Style.toBold(Style.toRed(f' >> Hashrate is under the 0.2TH/s : {hashCheckingList}')))
-                else:
-                    self.console_out(Style.toBold(Style.toGreen(' >> Clear')))
+            # Hash check
+            print('Hash check ...')
+            hashCheckingList = []
+            for worker in workerList_web:
+                if worker[1] <= 0.3: # 오차 범위 생각해서 0.3TH/s = 300.0GH/s 이하로 떨어진 경우
+                    hashCheckingList.append([worker[0], worker[1]])
+            
+            if len(hashCheckingList) != 0: # 비정상적인 hash를 가진 device가 발견됨
+                print('Hash reduction deivce found !!')
+                self.console_out(Style.toBoldRed(f' >> [Hashrate is under the 0.3TH/s (300.0GH/s)]'))
+                self.console_out(Style.toBoldRed(f' >> Size : {len(hashCheckingList)}'))
+                self.console_out(Style.toBoldRed(f' >> List : {hashCheckingList}'))
+                Discord.hash_alert(DB.loadWEBHOOK(), DB.loadInfo(), hashCheckingList, key, nowTime)
+            
+            # Add, Remove, Hash problem 아무런 event가 발생하지 않은 경우
+            if len(addedList) == 0 and len(removeList) == 0 and len(hashCheckingList) == 0:
+                print('Clear !!')
+                self.console_out(Style.toBold(Style.toGreen(' >> [Clear]')))
 
                         
 
@@ -259,7 +281,7 @@ class MyWindow(QWidget):
         self.btn_stop.setDisabled(True) # freeze
 
         ### program start
-        self.console_out(f'=== Program start === <{getNowTime().strftime("%Y-%m-%d %H:%M:%S")}>\n')
+        self.console_out(f'=== Program start === <{getNowTime().strftime("%H시 %M분 %S초 (%Y-%m-%d)")}>\n')
 
         ### load and print option setting
         # load
@@ -274,7 +296,7 @@ class MyWindow(QWidget):
             if st == ERRORTEXT:
                 self.console_out('-> ' + Style.toRed(f"Disconnected"))
                 self.console_out(getErrorTxt('The Webhook Link is not available'))
-                return
+                return -1
             else:
                 self.console_out(st)
         self.console_out('')
@@ -290,6 +312,7 @@ class MyWindow(QWidget):
         self.console_out('')
 
         self.btn_stop.setEnabled(True) # unfreeze
+        return 0
 
     def run_process_mainLoop(self):
         self.run_process_check()
@@ -298,8 +321,10 @@ class MyWindow(QWidget):
         self.timer.start()
     
     def run(self):
-        self.run_process_init()
-        self.run_process_mainLoop()
+        ret = self.run_process_init()
+        if ret == -1: 
+            self.btn_stop_function()
+        else: self.run_process_mainLoop()
 
     def run_process_exit(self):
         self.timer.end()
@@ -372,7 +397,11 @@ class MyWindow(QWidget):
         chechBox_infoData = DB.loadInfo()
         for checkBox in OPTION_INFO_LIST:
             checkBox_infoList.append(QCheckBox(checkBox, self))
-            
+        checkBox_infoList[0].setDisabled(True) 
+        checkBox_infoList[1].setDisabled(True)
+        checkBox_infoList[3].setDisabled(True)
+
+
         for i in range(0, len(OPTION_INFO_LIST)):
             if chechBox_infoData[i] == '1':
                 checkBox_infoList[i].toggle()

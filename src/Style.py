@@ -15,3 +15,6 @@ def toBold(st):
 
 def toLink(st):
     return f'<a href="{st}">{st}</a>'
+
+def toBoldRed(st):
+     return toBold(toRed(st))
