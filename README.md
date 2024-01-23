@@ -23,7 +23,7 @@ Network 및 Worker 상태를 모니터링 하고, Discord([Discord Webhook](http
 
 ## 세부 기능
 ### Webhook Menu
-![Mining Manager v1 0 0-Alpha 웹훅 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/d58983a4-775f-44d2-8884-f9f926e96305)
+![webhook](https://github.com/kookjd7759/Mining-Manager/assets/67672017/99ebe6e3-0fec-48a3-ae34-27235de88943)
 
 Webhook Link와 관련한 메뉴 창
 - 저장된 Webhook Link를 표시
@@ -32,24 +32,21 @@ Webhook Link와 관련한 메뉴 창
 - [Connection Test] : 해당 Webhook Link를 통해 Test message(인증 코드 4자리) 전송
 
 ### Option Menu
-![Mining Manager v1 0 0-Alpha 옵션 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/1feb4cf8-2910-43bc-b2e4-6763efc0ddf2)
+![option](https://github.com/kookjd7759/Mining-Manager/assets/67672017/9c8aa501-559f-42f3-9bb1-cdb247bb7b62)
 
 Option 설정이 가능한 메뉴 창
 - [Checking Time (min)] : 채굴 수행 상태를 확인할 주기를 분 단위로 설정
-- [Receive notification when] : 알림을 전송할 조건을 설정
+- [Receive notification when] : 알림을 수신할 조건을 설정
 - [Receive following information] : 수신할 정보를 설정
 - [Reset default values] : 옵션 설정을 기본값으로 변경
 
-### Main Menu
-![Mining Manager v1 0 0-Alpha 4btn 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/85780a89-5a7e-4442-9a53-6f16fcb41f52)
+### Menu And Excution console 
+![menu and excution console](https://github.com/kookjd7759/Mining-Manager/assets/67672017/f8968685-be5a-49ee-bfbb-ebbbe3c6f77c)
 
-프로그램 동작에 관한 메뉴 창
 - [Quit] : 프로그램 종료
 - [Restart] : 프로그램 재시작
 - [Start] : 설정된 Webhook과 Option 설정으로 모니터링을 시작
 - [Stop] : 모니터링 종료
+- Excution Console : 현재 모니터링 실행 정보를 볼 수 있는 콘솔 화면
 
-### Excution Colsole Menu
-![Mining Manager v1 0 0-Alpha 하단 메뉴](https://github.com/kookjd7759/Mining-Manager/assets/67672017/d9fe6e54-086b-4ebd-a2d1-e5966f9a8716)
 
-현재 모니터링 실행 정보를 볼 수 있는 콘솔 화면
