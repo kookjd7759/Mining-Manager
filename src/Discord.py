@@ -23,7 +23,7 @@ def connectionTest(WEBHOOK):
         return -1
     return 1
 
-def add_alert(WEBHOOK, Infosetting, addedWorkerList, url_key, time):
+def add_alert(WEBHOOK, Infosetting, addedWorkerList, url_key, time, worker_name_hashList):
     print('Call add_alert')
     text = ''
     if Infosetting[0] == '1':
@@ -36,10 +36,15 @@ def add_alert(WEBHOOK, Infosetting, addedWorkerList, url_key, time):
         text += f'- 추가된 Worker : {addedWorkerList}\n'
         text += f'- 추가된 Pool : [{url_key}]({Web.User_url_dictionary[url_key]})\n'
 
-    
+    if Infosetting[4] == '1':
+        text += f'- 현재 Pool 현황\n'
+        text += f'  - Worker size : {len(worker_name_hashList)}\n'
+        for worker in worker_name_hashList:
+            text += f'  - \'{worker[0]}\'\t\t\t[{worker[1]}TH/s]\n'
+
     send_message(WEBHOOK, text)
 
-def remove_alert(WEBHOOK, Infosetting, removedWorkerList, url_key, time):
+def remove_alert(WEBHOOK, Infosetting, removedWorkerList, url_key, time, worker_name_hashList):
     print('Call remove_alert')
     text = ''
     if Infosetting[0] == '1':
@@ -52,10 +57,15 @@ def remove_alert(WEBHOOK, Infosetting, removedWorkerList, url_key, time):
         text += f'- 삭제된 Worker : {removedWorkerList}\n'
         text += f'- 삭제된 Pool : [{url_key}]({Web.User_url_dictionary[url_key]})\n'
 
+    if Infosetting[4] == '1':
+        text += f'- 현재 Pool 현황\n'
+        text += f'  - Worker size : {len(worker_name_hashList)}\n'
+        for worker in worker_name_hashList:
+            text += f'  - \'{worker[0]}\'\t\t\t[{worker[1]}TH/s]\n'
     
     send_message(WEBHOOK, text)
 
-def hash_alert(WEBHOOK, Infosetting, hashCheckingList, url_key, time):
+def hash_alert(WEBHOOK, Infosetting, hashCheckingList, url_key, time, worker_name_hashList):
     print('Call hash_alert')
     text = ''
     if Infosetting[0] == '1':
@@ -67,8 +77,13 @@ def hash_alert(WEBHOOK, Infosetting, hashCheckingList, url_key, time):
     if Infosetting[1] == '1':
         text += f'- Worker\n'
         for worker in hashCheckingList:
-            text += f'  - \'{worker[0]}\'   [{worker[1]}TH/s]\n'
+            text += f'  - \'{worker[0]}\'\t\t[{worker[1]}TH/s]\n'
         text += f'- Pool : [{url_key}]({Web.User_url_dictionary[url_key]})\n'
 
+    if Infosetting[4] == '1':
+        text += f'- 현재 Pool 현황\n'
+        text += f'  - Worker size : {len(worker_name_hashList)}\n'
+        for worker in worker_name_hashList:
+            text += f'  - \'{worker[0]}\'\t\t\t[{worker[1]}TH/s]\n'
     
     send_message(WEBHOOK, text)

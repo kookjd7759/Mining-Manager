@@ -11,7 +11,7 @@ import Web
 import Discord
 import Style
 
-VERSION = 'v1.0.0-Alpha'
+VERSION = 'v1.0.0-Beta1'
 
 RESTARTCODE = 100
 ERRORTEXT = 'ERROR::-1'
@@ -129,7 +129,7 @@ class Timer(QThread):
 
 
 class MyWindow(QWidget):
-
+    
     def __init__(self):
         super().__init__()
         self.init()
@@ -146,6 +146,8 @@ class MyWindow(QWidget):
         
         self.timer = Timer(self)
         self.timer.checking_signal.connect(self.run_process_check)
+
+        self.hash_reduction_list = []
     
     # Move this window to middle of screen
     def center(self):
@@ -228,7 +230,8 @@ class MyWindow(QWidget):
                 self.console_out(Style.toBoldRed(f' >> List : {addedList}'))
                 workerNameList_DB.sort()
                 DB.saveDB(key, workerNameList_DB)
-                Discord.add_alert(DB.loadWEBHOOK(), DB.loadInfo(), addedList, key, nowTime)
+                if DB.loadWhen()[1] == '1':
+                    Discord.add_alert(DB.loadWEBHOOK(), DB.loadInfo(), addedList, key, nowTime, workerList_web)
             
             # Remove check
             print('Remove check ...')
@@ -245,7 +248,8 @@ class MyWindow(QWidget):
                 self.console_out(Style.toBoldRed(f' >> List : {removeList}'))
                 workerNameList_DB.sort()
                 DB.saveDB(key, workerNameList_DB)
-                Discord.remove_alert(DB.loadWEBHOOK(), DB.loadInfo(), removeList, key, nowTime)
+                if DB.loadWhen()[2] == '1':
+                    Discord.remove_alert(DB.loadWEBHOOK(), DB.loadInfo(), removeList, key, nowTime, workerList_web)
 
             # Hash check
             print('Hash check ...')
@@ -256,10 +260,19 @@ class MyWindow(QWidget):
             
             if len(hashCheckingList) != 0: # 비정상적인 hash를 가진 device가 발견됨
                 print('Hash reduction deivce found !!')
+                check = False
+                for device in hashCheckingList: # 해당 device를 list에 추가
+                    if device not in self.hash_reduction_list:
+                        self.hash_reduction_list.append(device)
+                        check = True
+                
                 self.console_out(Style.toBoldRed(f' >> [Hashrate is under the 0.3TH/s (300.0GH/s)]'))
+                if check == True:
+                    self.console_out(Style.toBoldRed(f' >> NEW one has found !!!!!'))
                 self.console_out(Style.toBoldRed(f' >> Size : {len(hashCheckingList)}'))
                 self.console_out(Style.toBoldRed(f' >> List : {hashCheckingList}'))
-                Discord.hash_alert(DB.loadWEBHOOK(), DB.loadInfo(), hashCheckingList, key, nowTime)
+                if check == True and DB.loadWhen()[0] == '1':
+                    Discord.hash_alert(DB.loadWEBHOOK(), DB.loadInfo(), hashCheckingList, key, nowTime, workerList_web)
             
             # Add, Remove, Hash problem 아무런 event가 발생하지 않은 경우
             if len(addedList) == 0 and len(removeList) == 0 and len(hashCheckingList) == 0:
