@@ -1,6 +1,5 @@
 # 암호화폐 채굴 모니터링 프로그램 Mining Manager (v1.0.0-Alpha)
-![Mining Manager v1.0.0Beta1 excuted window](https://github.com/kookjd7759/Mining-Manager/assets/67672017/dd3adbde-2a6a-42b1-aa72-7daeeb56e086)
-
+![Mining Manager Logo](https://github.com/kookjd7759/Mining-Manager/assets/67672017/0c942f56-db7a-49bf-b2a9-b9b1b119d724)
 
 ## 프로젝트 소개
 - Mining Manager는 암호화폐 채굴 수행 상태를 수시로 모니터링하는 프로그램입니다.
@@ -18,7 +17,8 @@
 ## 주요 기능
 Network 및 Worker 상태를 모니터링 하고, Discord([Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks))를 통해 사용자에게 알림을 전송.
 ### 전체 실행 화면
-![Mining Manager v1 0 0-Beta1 실행 화면](https://github.com/kookjd7759/Mining-Manager/assets/67672017/8104522d-455f-4973-af4e-d2e68aec8902)
+![Mining Manager v1.0.0Beta1 Excuted window](https://github.com/kookjd7759/Mining-Manager/assets/67672017/c45f379e-816b-483a-892d-601a76db2e76)
+
 
 
 ## 세부 기능
