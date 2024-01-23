@@ -17,7 +17,8 @@
 ## 주요 기능
 Network 및 Worker 상태를 모니터링 하고, Discord([Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks))를 통해 사용자에게 알림을 전송.
 ### 전체 실행 화면
-![Mining Manager v1 0 0-Alpha 실행 화면](https://github.com/kookjd7759/Mining-Manager/assets/67672017/e6bad2bc-7b0c-4048-9bd5-078596bb2502)
+![Mining Manager v1 0 0-Beta1 실행 화면](https://github.com/kookjd7759/Mining-Manager/assets/67672017/8104522d-455f-4973-af4e-d2e68aec8902)
+
 
 ## 세부 기능
 ### Webhook Menu
