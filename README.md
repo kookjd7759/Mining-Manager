@@ -1,5 +1,6 @@
 # 암호화폐 채굴 모니터링 프로그램 Mining Manager (v1.0.0-Alpha)
-![Mining Manager Logo](https://github.com/kookjd7759/Mining-Manager/assets/67672017/0c942f56-db7a-49bf-b2a9-b9b1b119d724)
+![Mining Manager v1.0.0Beta1 excuted window](https://github.com/kookjd7759/Mining-Manager/assets/67672017/dd3adbde-2a6a-42b1-aa72-7daeeb56e086)
+
 
 ## 프로젝트 소개
 - Mining Manager는 암호화폐 채굴 수행 상태를 수시로 모니터링하는 프로그램입니다.
