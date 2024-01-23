@@ -1,6 +1,6 @@
 import Web
 
-DBPATH = './Mining Manager/DataBase/'
+DBPATH = './DataBase/'
 WEBHOOK_DB_NAME = 'WEBHOOK'
 CHECKINGTIME_DB_NAME = 'Option_time'
 INFO_DB_NAME = 'Option_info'
@@ -157,3 +157,4 @@ def loadDB(key):
     return resultList
 
 
+print(loadWEBHOOK())

@@ -55,21 +55,3 @@ def getList(key):
     return name_hashList
 
 
-
-if __name__ == "__main__":
-    for key in Url_dictionary:
-        url = Url_dictionary[key][0]
-        header = {
-        'referer': Url_dictionary[key][1]
-        }
-        data = get_json(url=url, header=header)
-        name_hashList = []
-        if key == KEY_kaspaPool:
-            for worker in data['workers']:
-                name_hashList.append([worker['name'], round(float(worker['current_hashrate']['hashrate']), 2)])
-        elif key == KEY_kas2miner:
-            for name in data['workers']:
-                name_hashList.append([name, round(float(data['workers'][name]['hr']) / 1000000000000.0, 2)])
-        
-        name_hashList.sort(key=lambda x:x[0]) # 첫번째 값 기준 ('name') 정렬
-        print(name_hashList)

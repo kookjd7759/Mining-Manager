@@ -2,6 +2,7 @@ import sys
 import random
 import time
 import datetime
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -569,7 +570,6 @@ class MyWindow(QWidget):
 
 
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     while True:
@@ -582,4 +582,3 @@ if __name__ == "__main__":
         else:
             print('Quit the program')
             break
-    
