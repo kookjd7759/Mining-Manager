@@ -1,6 +1,7 @@
 import Web
+from os import path
 
-DBPATH = './DataBase/'
+DBPATH = f'{path.dirname(path.abspath(__file__))}\\DataBase\\'
 WEBHOOK_DB_NAME = 'WEBHOOK'
 CHECKINGTIME_DB_NAME = 'Option_time'
 INFO_DB_NAME = 'Option_info'
@@ -157,4 +158,5 @@ def loadDB(key):
     return resultList
 
 
-print(loadWEBHOOK())
+if __name__ == "__main__":
+    print(f'path : {path.dirname(path.abspath(__file__))}')

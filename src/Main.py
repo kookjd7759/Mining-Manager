@@ -74,9 +74,6 @@ def getSetting(webhook, time, when_seq, info_seq):
     
     return stList
 
-def getErrorTxt(text):
-    return Style.toRed(f'Error occurred :: \"{text}\"')
-
 def getOneNetworkState(key):
     webreturn = Web.connection_test(Web.Url_dictionary[key][0])
     if webreturn == 200:
@@ -309,7 +306,7 @@ class MyWindow(QWidget):
         for st in stList:
             if st == ERRORTEXT:
                 self.console_out('-> ' + Style.toRed(f"Disconnected"))
-                self.console_out(getErrorTxt('The Webhook Link is not available'))
+                self.console_out(Style.toRed(f'Error occurred :: \"The Webhook Link is not available\"'))
                 return -1
             else:
                 self.console_out(st)
@@ -511,8 +508,7 @@ class MyWindow(QWidget):
         qApp.exit(RESTARTCODE)
     
     def btn_edit_function(self):
-        text, ok = QInputDialog.getText(self, 'Edit WebHook', 'Enter the WebHook url')
-        WEBHOOK = text
+        WEBHOOK, ok = QInputDialog.getText(self, 'Edit WebHook', 'Enter the WebHook url')
         if ok:
             DB.saveWEBHOOK(WEBHOOK)
             qApp.exit(RESTARTCODE)
@@ -524,11 +520,10 @@ class MyWindow(QWidget):
             qApp.exit(RESTARTCODE)
     
     def btn_ConnectionTest_function(self):
-        WEBHOOK = DB.loadWEBHOOK()
         verifyingCode = ''
         for _ in range(0, 4):
             verifyingCode += str(random.randrange(0, 10))
-        program = Discord.send_message(WEBHOOK, f'VerifyingCode : {verifyingCode}')
+        program = Discord.send_message(DB.loadWEBHOOK(), f'VerifyingCode : {verifyingCode}')
         if program == -1:
             QMessageBox.warning(self, 'Webhook Error', f'The Webhook link is not work. Check the Webhook Link')
         else:

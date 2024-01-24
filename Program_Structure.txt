@@ -1,0 +1,15 @@
+Mining_Manager
+├── Imgae
+│    └── Icon
+│        └── Title_Icon.png
+└── src
+     ├── DataBase
+          ├── <WorkerList> ...
+          ├── <OptionList> ...
+          └── WEBHOOK.txt
+     ├── DB.py
+     ├── Discord.py
+     ├── Main.py
+     ├── setup.py
+     ├── Style.py
+     └── Web.py

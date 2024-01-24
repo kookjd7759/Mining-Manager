@@ -3,14 +3,20 @@ import sys
 
 buildOptions = {
 	"packages":[
-    	'sys','random','time','datetime','PyQt5.QtWidgets', 'PyQt5.QtGui', 'PyQt5.QtCore', 'requests', 'json'
+    	'sys', 'random', 'time', 'datetime',
+        'PyQt5.QtWidgets', 'PyQt5.QtGui', 'PyQt5.QtCore', 
+        'requests', 'json'
     ],
     "excludes":[
-
+        
     ]
 }
- 
-exe = [Executable('Main.py', base='Win32GUI')]
+
+base = None
+if sys.platform == "win32":
+    base = "Win32GUI"
+
+exe = [Executable("Main.py", base=base)]
  
 setup(
     name='Mining Manager',
