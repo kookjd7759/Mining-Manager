@@ -48,5 +48,3 @@ Option 설정이 가능한 메뉴 창
 - [Start] : 설정된 Webhook과 Option 설정으로 모니터링을 시작
 - [Stop] : 모니터링 종료
 - Excution Console : 현재 실행 정보를 볼 수 있는 콘솔 화면
-
-
