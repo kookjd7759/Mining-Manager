@@ -11,8 +11,8 @@
   - [kas.2miners.com](https://kas.2miners.com)
 
 ## 개발 환경
-- Front-end : PyQt5
-- Back-end : Web Request, Discord API
+- UI : Python-PyQt5
+- Main Tools : Web Request, Discord API
 
 ## 주요 기능
 Network 및 Worker 상태를 모니터링 하고, Discord([Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks))를 통해 사용자에게 알림을 전송.
