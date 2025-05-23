@@ -1,4 +1,3 @@
-# Mining Manager
 ![Mining Manager Logo](https://github.com/kookjd7759/Mining-Manager/assets/67672017/0c942f56-db7a-49bf-b2a9-b9b1b119d724)
 
 ## 프로젝트 소개
