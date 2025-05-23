@@ -3,7 +3,7 @@
 ## 프로젝트 소개
 - Mining Manager는 암호화폐 채굴 수행 상태를 수시로 모니터링하는 프로그램입니다.
 - Mining Pool 과 Device 와의 Network Connection, Worker의 동작 상태를 모니터링해 문제 발생시 사용자에게 알림을 보냅니다.
--전체 채굴 현황을 요약하여 사용자에게 전송합니다.
+- 전체 채굴 현황을 요약하여 사용자에게 전송합니다.
 
 - 지원하는 Mining Pool 
   - [kaspa-pool.org](https://kaspa-pool.org)
